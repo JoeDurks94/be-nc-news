@@ -6,6 +6,8 @@ const {
   formatComments,
 } = require('./utils');
 
+const { topicData, userData, articleData, commentData } = require('../data/test-data/index')
+
 const seed = ({ topicData, userData, articleData, commentData }) => {
   return db
     .query(`DROP TABLE IF EXISTS comments;`)
