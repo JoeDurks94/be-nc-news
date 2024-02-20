@@ -5,6 +5,7 @@ const {
   getTopics,
   getAPI,
   getArticleById,
+  getAllArticles,
 } = require("./controller/app.controller.js");
 
 app.get("/api/topics", getTopics);
@@ -12,6 +13,8 @@ app.get("/api/topics", getTopics);
 app.get("/api", getAPI);
 
 app.get("/api/articles/:article_id", getArticleById);
+
+app.get("/api/articles", getAllArticles)
 
 app.use((error, request, response, next) => {
   if (error.status === 404) {
