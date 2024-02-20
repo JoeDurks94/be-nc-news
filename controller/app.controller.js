@@ -1,5 +1,5 @@
-const { getAllTopics } = require("../model/app.model");
-const allEndpoints = require("../endpoints.json")
+const { getAllTopics, fetchArticleById } = require("../model/app.model");
+const allEndpoints = require("../endpoints.json");
 
 function getTopics(request, response, next) {
   getAllTopics().then((topicsArray) => {
@@ -8,7 +8,17 @@ function getTopics(request, response, next) {
 }
 
 function getAPI(request, response, next) {
-    response.status(200).send(allEndpoints)
+  response.status(200).send(allEndpoints);
 }
 
-module.exports = { getTopics, getAPI };
+function getArticleById(request, response, next) {
+  fetchArticleById(request.params.article_id)
+    .then((article) => {
+      response.status(200).send({ article });
+    })
+    .catch((error) => {
+      next(error);
+    });
+}
+
+module.exports = { getTopics, getAPI, getArticleById };
