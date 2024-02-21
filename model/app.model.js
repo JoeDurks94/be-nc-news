@@ -1,6 +1,6 @@
 const db = require("../db/connection");
 
-function getAllTopics(request, response) {
+function fetchAllTopics(request, response) {
 	return db.query("SELECT * FROM topics;").then((result) => {
 		return result.rows;
 	});
@@ -43,17 +43,20 @@ ORDER BY
 		});
 }
 
-// .query(
-// 			`SELECT
-//     articles.author,
-//     articles.title,
-//     articles.article_id,
-//     articles.topic,
-//     articles.created_at,
-//     articles.votes,
-//     articles.article_img_url,
-//     COUNT(count.article_id) AS co
-//     JOIN comments on comments.article_id = article.article_id ORDER BY created_at DESC`
-// 		)
+function fetchCommentsByArticleId(lookUpArticleId) {
+	return db
+		.query(
+			`SELECT comment_id, votes, created_at, author, body, article_id FROM comments WHERE article_id = $1 ORDER BY comments.created_at DESC`,
+			[lookUpArticleId]
+		)
+		.then((result) => {
+			return result.rows;
+		});
+}
 
-module.exports = { getAllTopics, fetchArticleById, fetchAllArticles };
+module.exports = {
+	fetchCommentsByArticleId,
+	fetchAllTopics,
+	fetchArticleById,
+	fetchAllArticles,
+};

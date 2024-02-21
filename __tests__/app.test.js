@@ -177,3 +177,62 @@ describe("GET /api/articles", () => {
 			});
 	});
 });
+describe("GET /api/articles/:article_id/comments", () => {
+	it("should send the correct status code (200) back when passed an article id of an article that contains comments", () => {
+		return request(app).get("/api/articles/1/comments").expect(200);
+	});
+	it("should send the correct status code back (400) when passed an article id that is invalid - the parameter should be an integer", () => {
+		return request(app).get("/api/articles/two/comments").expect(400);
+	});
+	it("should send the correct status code back (404) when passed an article id that is valid but doesnt exist", () => {
+		return request(app).get("/api/articles/90909/comments").expect(404);
+	});
+	it("should send the correct status code back (200) when passed an article id that exists but does not have any comments", () => {
+		return request(app)
+			.get("/api/articles/2/comments")
+			.expect(200)
+			.then((data) => {
+				expect(data.body.msg).toBe(
+					"there any no comments for the supplied acticle"
+				);
+			});
+	});
+	it("should respond with an array of comments for the given article_id of the correct amount of comments for a article that has one comment", () => {
+		return request(app)
+			.get("/api/articles/6/comments")
+			.expect(200)
+			.then((data) => {
+				expect(data.body.comments.length).toBe(1);
+				expect(Array.isArray(data.body.comments)).toBeTrue();
+			});
+	});
+	it("should respond with an array of comments for the given article_id of the correct amount of comments for a article that has multiple comments all of which will have the correct keys on then", () => {
+		return request(app)
+			.get("/api/articles/1/comments")
+			.expect(200)
+			.then((data) => {
+				expect(data.body.comments.length).toBe(11);
+				expect(Array.isArray(data.body.comments)).toBeTrue();
+				data.body.comments.forEach((comment) => {
+					expect(Object.keys(comment)).toInclude(
+						"author",
+						"votes",
+						"comment_id",
+						"body",
+						"article_id",
+						"created_at"
+					);
+				});
+			});
+	});
+	it("should respond with an array of comments that are in descending order of when it was created", () => {
+		return request(app)
+			.get("/api/articles/5/comments")
+			.expect(200)
+			.then((data) => {
+				expect(data.body.comments).toBeSortedBy("created_at", {
+					descending: true,
+				});
+			});
+	});
+});
