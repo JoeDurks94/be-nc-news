@@ -409,3 +409,112 @@ describe("POST /api/articles/:article_id/comments", () => {
 			});
 	});
 });
+describe("PATCH /api/articles/:article_id", () => {
+	it("should respond with the correct status code when given the correct input", () => {
+		return request(app)
+			.patch("/api/articles/4")
+			.send({
+				inc_votes: 1,
+			})
+			.expect(200);
+	});
+	it("should respond with the correct status code when given the correct input and increase by the  givne amount - this article did not have any votes before", () => {
+		return request(app)
+			.patch("/api/articles/4")
+			.send({
+				inc_votes: 1,
+			})
+			.expect(200)
+			.then((data) => {
+				expect(data.body.votes).toBe(1);
+			});
+	});
+	it("should be able to increase by a varying value not only just +1", () => {
+		return request(app)
+			.patch("/api/articles/6")
+			.send({
+				inc_votes: 40,
+			})
+			.expect(200)
+			.then((data) => {
+				expect(data.body.votes).toBe(40);
+			});
+	});
+	it("should be able to increase by a varying value and not overwrite the value but increase it - this article already has 100 votes insided the database", () => {
+		return request(app)
+			.patch("/api/articles/1")
+			.send({
+				inc_votes: 40,
+			})
+			.expect(200)
+			.then((data) => {
+				expect(data.body.votes).toBe(140);
+			});
+	});
+	it("should be able to decrease by 1 and not overwrite the value but decrease it - this article already has 100 votes insided the database", () => {
+		return request(app)
+			.patch("/api/articles/1")
+			.send({
+				inc_votes: -1,
+			})
+			.expect(200)
+			.then((data) => {
+				expect(data.body.votes).toBe(99);
+			});
+	});
+	it("should be able to decrease by a varying value and not overwrite the value but decrease it - this article already has 100 votes insided the database", () => {
+		return request(app)
+			.patch("/api/articles/1")
+			.send({
+				inc_votes: -40,
+			})
+			.expect(200)
+			.then((data) => {
+				expect(data.body.votes).toBe(60);
+			});
+	});
+	it("should respond with error code when the key is incorrect", () => {
+		return request(app)
+			.patch("/api/articles/1")
+			.send({
+				incvotes: -40,
+			})
+			.expect(400)
+			.then((data) => {
+				expect(data.body.msg).toBe("Bad request!");
+			});
+	});
+	it("should respond with error code when the value is of the incorrect type", () => {
+		return request(app)
+			.patch("/api/articles/4")
+			.send({
+				inc_votes: "four",
+			})
+			.expect(400)
+			.then((data) => {
+				expect(data.body.msg).toBe("Bad request!");
+			});
+	});
+	it("should send back the updated article with the correct amount of votes", () => {
+		return request(app)
+			.patch("/api/articles/1")
+			.send({
+				inc_votes: 40,
+			})
+			.expect(200)
+			.then((data) => {
+				expect(data.body.votes).toBe(140);
+				expect(data.body).toMatchObject({
+					article_id: 1,
+					title: "Living in the shadow of a great man",
+					topic: "mitch",
+					author: "butter_bridge",
+					body: "I find this existence challenging",
+					created_at: "2020-07-09T20:11:00.000Z",
+					votes: 140,
+					article_img_url:
+						"https://images.pexels.com/photos/158651/news-newsletter-newspaper-information-158651.jpeg?w=700&h=700",
+				});
+			});
+	});
+});

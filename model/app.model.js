@@ -74,10 +74,28 @@ function sendComment(articleId, comment) {
 		});
 }
 
+function amendVotes(articleId, voteAmt) {
+	if (
+		!Object.keys(voteAmt).includes("inc_votes") ||
+		typeof voteAmt.inc_votes !== "number"
+	) {
+		return Promise.reject({ status: 400, msg: "Bad request!" });
+	}
+	return db
+		.query(
+			`UPDATE articles SET votes = votes + $1 WHERE article_id =$2 RETURNING*`,
+			[voteAmt.inc_votes, articleId]
+		)
+		.then((result) => {
+			return result.rows[0];
+		});
+}
+
 module.exports = {
 	fetchCommentsByArticleId,
 	fetchAllTopics,
 	fetchArticleById,
 	fetchAllArticles,
 	sendComment,
+	amendVotes,
 };
