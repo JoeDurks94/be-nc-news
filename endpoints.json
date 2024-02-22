@@ -70,5 +70,20 @@
 				"article_id": 5
 			}
 		]
+	},
+	"POST /api/articles/:article_id/comments": {
+		"description": "this endpoint allows the user to post comments to an article by supplying the article_id of which article is to be posted on",
+		"exampleInput": {
+			"username": "rogersop",
+			"body": "this is an example of a comment"
+		},
+		"exampleResponse": {
+			"comment_id": 15,
+			"votes": 0,
+			"created_at": "2020-11-24T00:08:00.000Z",
+			"author": "butter_bridge",
+			"body": "I am 100% sure that we're not completely sure.",
+			"article_id": 5
+		}
 	}
 }

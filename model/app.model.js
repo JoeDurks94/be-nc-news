@@ -54,9 +54,30 @@ function fetchCommentsByArticleId(lookUpArticleId) {
 		});
 }
 
+function sendComment(articleId, comment) {
+	if (
+		!Object.keys(comment).includes("username") ||
+		!Object.keys(comment).includes("body")
+	) {
+		return Promise.reject({ status: 400, msg: "Bad request!" });
+	}
+	if (Object.keys(comment).length !== 2) {
+		return Promise.reject({ status: 400, msg: "Bad request!" });
+	}
+	return db
+		.query(
+			`INSERT INTO comments (article_id, body, author, votes) VALUES ($1, $2, $3, $4) RETURNING *;`,
+			[articleId, comment.body, comment.username, 0]
+		)
+		.then((result) => {
+			return result.rows[0];
+		});
+}
+
 module.exports = {
 	fetchCommentsByArticleId,
 	fetchAllTopics,
 	fetchArticleById,
 	fetchAllArticles,
+	sendComment,
 };
