@@ -4,6 +4,7 @@ const {
 	fetchAllArticles,
 	fetchCommentsByArticleId,
 	sendComment,
+	amendVotes,
 } = require("../model/app.model");
 const allEndpoints = require("../endpoints.json");
 
@@ -72,6 +73,21 @@ function postComment(request, response, next) {
 		});
 }
 
+function patchArticle(request, response, next) {
+	const promises = [
+		fetchArticleById(request.params.article_id),
+		amendVotes(request.params.article_id, request.body),
+	];
+	Promise.all(promises)
+		.then((data) => {
+			const formattedArticle = data[1]
+			response.status(200).send(formattedArticle);
+		})
+		.catch((error) => {
+			next(error);
+		});
+}
+
 module.exports = {
 	getCommentsByArticleId,
 	getTopics,
@@ -80,4 +96,5 @@ module.exports = {
 	getAllArticles,
 	postComment,
 	handleInvalidEndpoiont,
+	patchArticle,
 };
