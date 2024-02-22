@@ -9,8 +9,13 @@ beforeEach(() => seed(data));
 afterAll(() => db.end());
 
 describe("error handling", () => {
-	it("should return a 404 for not found", () => {
-		return request(app).get("/api/topix").expect(404);
+	it("should return a 404 for not found with an appropriate message", () => {
+		return request(app)
+			.get("/api/topix")
+			.expect(404)
+			.then((data) => {
+				expect(data.body.msg).toBe("invalid path");
+			});
 	});
 });
 describe("GET /api/topics", () => {
@@ -55,10 +60,20 @@ describe("GET /api/articles/:article_id", () => {
 		return request(app).get("/api/articles/6").expect(200);
 	});
 	it("should return with a 404 status code when passed an article id that does not exist but is valid", () => {
-		return request(app).get("/api/articles/90909").expect(404);
+		return request(app)
+			.get("/api/articles/90909")
+			.expect(404)
+			.then((data) => {
+				expect(data.body.msg).toBe("article does not exist");
+			});
 	});
 	it("should return with a 400 status code when passed an article id that is invalid - the parameter should be an integer", () => {
-		return request(app).get("/api/articles/nine").expect(400);
+		return request(app)
+			.get("/api/articles/nine")
+			.expect(400)
+			.then((data) => {
+				expect(data.body.msg).toBe("Bad request!");
+			});
 	});
 	it("should return an article object", () => {
 		return request(app)
@@ -182,10 +197,20 @@ describe("GET /api/articles/:article_id/comments", () => {
 		return request(app).get("/api/articles/1/comments").expect(200);
 	});
 	it("should send the correct status code back (400) when passed an article id that is invalid - the parameter should be an integer", () => {
-		return request(app).get("/api/articles/two/comments").expect(400);
+		return request(app)
+			.get("/api/articles/two/comments")
+			.expect(400)
+			.then((data) => {
+				expect(data.body.msg).toBe("Bad request!");
+			});
 	});
 	it("should send the correct status code back (404) when passed an article id that is valid but doesnt exist", () => {
-		return request(app).get("/api/articles/90909/comments").expect(404);
+		return request(app)
+			.get("/api/articles/90909/comments")
+			.expect(404)
+			.then((data) => {
+				expect(data.body.msg).toBe("article does not exist");
+			});
 	});
 	it("should send the correct status code back (200) when passed an article id that exists but does not have any comments", () => {
 		return request(app)
@@ -232,6 +257,154 @@ describe("GET /api/articles/:article_id/comments", () => {
 			.then((data) => {
 				expect(data.body.comments).toBeSortedBy("created_at", {
 					descending: true,
+				});
+			});
+	});
+});
+describe("POST /api/articles/:article_id/comments", () => {
+	it("should send the correct status code back (201) when passed the correct comment object ", () => {
+		return request(app)
+			.post("/api/articles/4/comments")
+			.send({
+				username: "lurker",
+				body: "test comment",
+			})
+			.expect(201);
+	});
+	it("should send the comment object back if the correct things are contained within the post request", () => {
+		return request(app)
+			.post("/api/articles/4/comments")
+			.send({
+				username: "lurker",
+				body: "test comment",
+			})
+			.then((data) => {
+				expect(typeof data.body === "object").toBeTrue();
+				expect(Object.keys(data.body).length).toBe(6);
+			});
+	});
+	it("should send the correct status code back (400) when passed nothing", () => {
+		return request(app).post("/api/articles/4/comments").expect(400);
+	});
+	it("should send the correct status code back (400) when passed an incomplete comment object - with the body ommited", () => {
+		return request(app)
+			.post("/api/articles/4/comments")
+			.send({
+				username: "lurker",
+			})
+			.expect(400)
+			.then((data) => {
+				expect(data.body.msg).toBe("Bad request!");
+			});
+	});
+	it("should send the correct status code back (400) when passed an imcomplete comment object - with the username ommited", () => {
+		return request(app)
+			.post("/api/articles/4/comments")
+			.send({
+				body: "test comment",
+			})
+			.expect(400)
+			.then((data) => {
+				expect(data.body.msg).toBe("Bad request!");
+			});
+	});
+	it("should send the correct status code back (400) when passed a comment object with too many key value pairs", () => {
+		return request(app)
+			.post("/api/articles/4/comments")
+			.send({
+				username: "lurker",
+				body: "test comment",
+				info: "please cause an error :)",
+			})
+			.expect(400)
+			.then((data) => {
+				expect(data.body.msg).toBe("Bad request!");
+			});
+	});
+	it("should send the correct status code back (404) when trying to post a comment to an article that doesnt exist ", () => {
+		return request(app)
+			.post("/api/articles/440/comments")
+			.send({
+				username: "lurker",
+				body: "test comment",
+			})
+			.expect(404)
+			.then((data) => {
+				expect(data.body.msg).toBe("Not found!");
+			});
+	});
+	it("should send the correct status code back (400) when passed a comment object that contains one incorrect keys", () => {
+		return request(app)
+			.post("/api/articles/4/comments")
+			.send({
+				username: "lurker",
+				bdy: "test comment",
+			})
+			.expect(400)
+			.then((data) => {
+				expect(data.body.msg).toBe("Bad request!");
+			});
+	});
+	it("should send the correct status code back (400) when passed a comment object that contains two incorrect keys", () => {
+		return request(app)
+			.post("/api/articles/4/comments")
+			.send({
+				usename: "lurker",
+				bdy: "test comment",
+			})
+			.expect(400)
+			.then((data) => {
+				expect(data.body.msg).toBe("Bad request!");
+			});
+	});
+	it("should send the correct status code back (404) when trying to post a comment to an article id that is of the wrong format - article_id should be an integer ", () => {
+		return request(app)
+			.post("/api/articles/four/comments")
+			.send({
+				username: "lurker",
+				body: "test comment",
+			})
+			.expect(400)
+			.then((data) => {
+				expect(data.body.msg).toBe("Bad request!");
+			});
+	});
+	it("should send the correct status code back (400) when trying to post a comment with a username that doesnt exist in the database", () => {
+		return request(app)
+			.post("/api/articles/4/comments")
+			.send({
+				username: "j4ckth3h4cker",
+				body: "test comment",
+			})
+			.expect(400)
+			.then((data) => {
+				expect(data.body.msg).toBe("User not found!");
+			});
+	});
+	it("should return the comment object back once posted and it should contain all the expected key value pairs", () => {
+		return request(app)
+			.post("/api/articles/4/comments")
+			.send({
+				username: "rogersop",
+				body: "Hello, this is a comment from Roger",
+			})
+			.expect(201)
+			.then((data) => {
+				expect(Object.keys(data.body)).toInclude(
+					"comment_id",
+					"body",
+					"article_id",
+					"author",
+					"votes",
+					"created_at"
+				);
+				expect(data.body).toMatchObject({
+					comment_id: expect.any(Number),
+					article_id: 4,
+					author: "rogersop",
+					body: "Hello, this is a comment from Roger",
+					created_at: expect.any(String),
+					votes: 0,
 				});
 			});
 	});

@@ -3,8 +3,13 @@ const {
 	fetchArticleById,
 	fetchAllArticles,
 	fetchCommentsByArticleId,
+	sendComment,
 } = require("../model/app.model");
 const allEndpoints = require("../endpoints.json");
+
+function handleInvalidEndpoiont(request, response, mext) {
+	response.status(404).send({ msg: "invalid path" });
+}
 
 function getTopics(request, response, next) {
 	fetchAllTopics().then((topicsArray) => {
@@ -46,11 +51,21 @@ function getCommentsByArticleId(request, response, next) {
 		.then((comments) => {
 			commentsArray = comments[0];
 			if (commentsArray.length === 0) {
-				response.status(200).send({
+				return response.status(200).send({
 					msg: "there any no comments for the supplied acticle",
 				});
 			}
 			response.status(200).send({ comments: commentsArray });
+		})
+		.catch((error) => {
+			next(error);
+		});
+}
+
+function postComment(request, response, next) {
+	sendComment(request.params.article_id, request.body)
+		.then((data) => {
+			response.status(201).send(data);
 		})
 		.catch((error) => {
 			next(error);
@@ -63,4 +78,6 @@ module.exports = {
 	getAPI,
 	getArticleById,
 	getAllArticles,
+	postComment,
+	handleInvalidEndpoiont,
 };
