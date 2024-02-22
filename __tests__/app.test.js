@@ -418,6 +418,22 @@ describe("PATCH /api/articles/:article_id", () => {
 			})
 			.expect(200);
 	});
+	it("should respond with the correct status code when given the incorrect article_id", () => {
+		return request(app)
+			.patch("/api/articles/999")
+			.send({
+				inc_votes: 1,
+			})
+			.expect(404);
+	});
+	it("should respond with the correct status code when given the correct input", () => {
+		return request(app)
+			.patch("/api/articles/four")
+			.send({
+				inc_votes: 1,
+			})
+			.expect(400);
+	});
 	it("should respond with the correct status code when given the correct input and increase by the  givne amount - this article did not have any votes before", () => {
 		return request(app)
 			.patch("/api/articles/4")
