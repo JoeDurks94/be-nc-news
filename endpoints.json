@@ -10,8 +10,8 @@
 		}
 	},
 	"GET /api/articles": {
-		"description": "serves an array of article objects",
-		"queries": [],
+		"description": "serves an array of article objects and can be queried by the topic",
+		"queries": ["topic"],
 		"exampleResponse": {
 			"articles": [
 				{

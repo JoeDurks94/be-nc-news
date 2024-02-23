@@ -601,3 +601,49 @@ describe("GET /api/users", () => {
 			});
 	});
 });
+
+describe("GET /api/articles (topic query)", () => {
+	it("should be able to take a query of a topic and return all articles of that topic", () => {
+		return request(app)
+			.get("/api/articles?topic=mitch")
+			.expect(200)
+			.then((data) => {
+				data.body.articles.forEach((article) => {
+					expect(article.topic).toBe("mitch");
+				});
+			});
+	});
+	it("should be able to take a query of a topic and return an array of the correct length", () => {
+		return request(app)
+			.get("/api/articles?topic=mitch")
+			.expect(200)
+			.then((data) => {
+				expect(data.body.articles).toHaveLength(12);
+			});
+	});
+	it("should be able to take a query of a topic and return an array of the correct length", () => {
+		return request(app)
+			.get("/api/articles?topic=cats")
+			.expect(200)
+			.then((data) => {
+				expect(data.body.articles).toHaveLength(1);
+				expect(data.body.articles[0].topic).toBe("cats");
+			});
+	});
+	it("should respond with an appropriate status code when given a query for a topic that doesnt exist", () => {
+		return request(app)
+			.get("/api/articles?topic=flowers")
+			.expect(404)
+			.then((data) => {
+				expect(data.body.msg).toBe("Not found!");
+			});
+	});
+	it("should be able to take a query of a topic and return an array of the correct length (0) if the topic is valid but nothing relating to the topic is inside the database", () => {
+		return request(app)
+			.get("/api/articles?topic=paper")
+			.expect(404)
+			.then((data) => {
+				expect(data.body.msg).toBe("Not found!");
+			});
+	});
+});
