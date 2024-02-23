@@ -6,6 +6,7 @@ const {
 	sendComment,
 	amendVotes,
 	findCommentToDelete,
+	fetchAllUsers		,
 } = require("../model/app.model");
 const allEndpoints = require("../endpoints.json");
 
@@ -91,8 +92,18 @@ function patchArticle(request, response, next) {
 
 function deleteComment(request, response, next) {
 	findCommentToDelete(request.params.comment_id)
-		.then(() => {
-			response.status(204).send();
+		.then((data) => {
+			response.status(204).send({ data });
+		})
+		.catch((error) => {
+			next(error);
+		});
+}
+
+function getAllUsers(request, response, next) {
+	fetchAllUsers()
+		.then((data) => {
+			response.status(200).send({ users: data });
 		})
 		.catch((error) => {
 			next(error);
@@ -109,4 +120,5 @@ module.exports = {
 	handleInvalidEndpoiont,
 	patchArticle,
 	deleteComment,
+	getAllUsers,
 };
