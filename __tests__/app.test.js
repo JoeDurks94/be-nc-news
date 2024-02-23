@@ -534,3 +534,14 @@ describe("PATCH /api/articles/:article_id", () => {
 			});
 	});
 });
+describe("DELETE /api/comments/:comment_id", () => {
+	it("should respond with the correct status code (204) when it successfully deletes a comment", () => {
+		return request(app).delete("/api/comments/2").expect(204);
+	});
+	it("should respond with the correct staus code (404) when passed an valid but incorrect comment_id", () => {
+		return request(app).delete("/api/comments/404040").expect(404);
+	});
+	it("should respond with the correct stauts code (400) when passed an invalid comment_id", () => {
+		return request(app).delete("/api/comments/four").expect(400);
+	});
+});
