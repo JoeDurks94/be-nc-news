@@ -85,5 +85,9 @@
 			"body": "I am 100% sure that we're not completely sure.",
 			"article_id": 5
 		}
+	},
+	"DELETE /api/comments/:comment_id": {
+		"description": "this endpoint allows the user to delete comments by passing it a valid comment_id of the comment they want to delete",
+		"exampleResponse": "204 Status code but no content is sent back"
 	}
 }

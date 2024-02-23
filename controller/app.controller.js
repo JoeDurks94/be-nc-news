@@ -5,6 +5,7 @@ const {
 	fetchCommentsByArticleId,
 	sendComment,
 	amendVotes,
+	findCommentToDelete,
 } = require("../model/app.model");
 const allEndpoints = require("../endpoints.json");
 
@@ -80,8 +81,18 @@ function patchArticle(request, response, next) {
 	];
 	Promise.all(promises)
 		.then((data) => {
-			const formattedArticle = data[1]
+			const formattedArticle = data[1];
 			response.status(200).send(formattedArticle);
+		})
+		.catch((error) => {
+			next(error);
+		});
+}
+
+function deleteComment(request, response, next) {
+	findCommentToDelete(request.params.comment_id)
+		.then(() => {
+			response.status(204).send();
 		})
 		.catch((error) => {
 			next(error);
@@ -97,4 +108,5 @@ module.exports = {
 	postComment,
 	handleInvalidEndpoiont,
 	patchArticle,
+	deleteComment,
 };
