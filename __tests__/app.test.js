@@ -18,6 +18,7 @@ describe("error handling", () => {
 			});
 	});
 });
+
 describe("GET /api/topics", () => {
 	it("should respond with a status of 200", () => {
 		return request(app).get("/api/topics").expect(200);
@@ -129,6 +130,7 @@ describe("GET /api/articles/:article_id", () => {
 			});
 	});
 });
+
 describe("GET /api/articles", () => {
 	it("should return with the correct status code - status 200", () => {
 		return request(app).get("/api/articles").expect(200);
@@ -181,6 +183,7 @@ describe("GET /api/articles", () => {
 				});
 			});
 	});
+
 	it("should return an object of articles that have been sorted by the created_at date, in descending order", () => {
 		return request(app)
 			.get("/api/articles")
@@ -261,6 +264,7 @@ describe("GET /api/articles/:article_id/comments", () => {
 			});
 	});
 });
+
 describe("POST /api/articles/:article_id/comments", () => {
 	it("should send the correct status code back (201) when passed the correct comment object ", () => {
 		return request(app)
@@ -409,6 +413,7 @@ describe("POST /api/articles/:article_id/comments", () => {
 			});
 	});
 });
+
 describe("PATCH /api/articles/:article_id", () => {
 	it("should respond with the correct status code when given the correct input", () => {
 		return request(app)
@@ -534,14 +539,65 @@ describe("PATCH /api/articles/:article_id", () => {
 			});
 	});
 });
+
 describe("DELETE /api/comments/:comment_id", () => {
 	it("should respond with the correct status code (204) when it successfully deletes a comment", () => {
 		return request(app).delete("/api/comments/2").expect(204);
 	});
 	it("should respond with the correct staus code (404) when passed an valid but incorrect comment_id", () => {
-		return request(app).delete("/api/comments/404040").expect(404);
+		return request(app)
+			.delete("/api/comments/404040")
+			.expect(404)
+			.then((data) => {
+				expect(data.body.msg).toBe("Not found!");
+			});
 	});
 	it("should respond with the correct stauts code (400) when passed an invalid comment_id", () => {
-		return request(app).delete("/api/comments/four").expect(400);
+		return request(app)
+			.delete("/api/comments/four")
+			.expect(400)
+			.then((data) => {
+				expect(data.body.msg).toBe("Bad request!");
+			});
+	});
+});
+
+describe("GET /api/users", () => {
+	it("should respond with the correct status code 200 when the correct path is sent", () => {
+		return request(app).get("/api/users").expect(200);
+	});
+	it("should respond with an array", () => {
+		return request(app)
+			.get("/api/users")
+			.expect(200)
+			.then((data) => {
+				expect(Array.isArray(data.body.users)).toBeTrue;
+			});
+	});
+	it("should respond with an array of objectscontaing 4 user objects", () => {
+		return request(app)
+			.get("/api/users")
+			.expect(200)
+			.then((data) => {
+				expect(data.body.users).toHaveLength(4);
+				data.body.users.forEach((user) => {
+					expect(typeof user).toBe("object");
+				});
+			});
+	});
+	it("should have the correct keys on the object of each user", () => {
+		return request(app)
+			.get("/api/users")
+			.expect(200)
+			.then((data) => {
+				expect(data.body.users).toHaveLength(4);
+				data.body.users.forEach((user) => {
+					expect(user).toMatchObject({
+						username: expect.any(String),
+						name: expect.any(String),
+						avatar_url: expect.any(String),
+					});
+				});
+			});
 	});
 });

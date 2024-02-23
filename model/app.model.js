@@ -106,6 +106,14 @@ function findCommentToDelete(commentId) {
 			return result.rows[0];
 		});
 }
+
+function fetchAllUsers() {
+	return db.query("SELECT * FROM users;").then((result) => {
+		console.log(result.rows);
+		return result.rows;
+	});
+}
+
 module.exports = {
 	fetchCommentsByArticleId,
 	fetchAllTopics,
@@ -114,4 +122,5 @@ module.exports = {
 	sendComment,
 	amendVotes,
 	findCommentToDelete,
+	fetchAllUsers,
 };
