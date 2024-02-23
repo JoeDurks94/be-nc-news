@@ -647,3 +647,26 @@ describe("GET /api/articles (topic query)", () => {
 			});
 	});
 });
+
+describe("GET /api/articles/:aticle_id - extra comment_count functionality check", () => {
+	it("should be able to access the correct comment count if comments exist", () => {
+		return request(app)
+			.get("/api/articles/1")
+			.expect(200)
+			.then((data) => {
+				expect(typeof data.body.article).toBe("object");
+				expect(data.body.article.article_id).toBe(1);
+				expect(data.body.article.comment_count).toBe("11");
+			});
+	});
+	it("should be able to access the correct comment count if no comments are stored for the arrticle", () => {
+		return request(app)
+			.get("/api/articles/2")
+			.expect(200)
+			.then((data) => {
+				expect(typeof data.body.article).toBe("object");
+				expect(data.body.article.article_id).toBe(2);
+				expect(data.body.article.comment_count).toBe("0");
+			});
+	});
+});
