@@ -17,10 +17,11 @@ function fetchArticleById(articleId) {
 		});
 }
 
-function fetchAllArticles() {
-	return db
-		.query(
-			`SELECT 
+function fetchAllArticles(query) {
+	if (query.topic) {
+		return db
+			.query(
+				`SELECT 
     articles.author,
     articles.title,
     articles.article_id,
@@ -32,15 +33,46 @@ function fetchAllArticles() {
 FROM
     articles
 LEFT JOIN 
-    comments ON comments.article_id = articles.article_id 
+    comments ON comments.article_id = articles.article_id
+WHERE
+	topic=$1
+GROUP BY 
+    articles.article_id
+ORDER BY 
+    articles.created_at DESC;`,
+				[query.topic]
+			)
+			.then((result) => {
+				if (result.rows.length === 0) {
+					return Promise.reject({ status: 404, msg: "Not found!" });
+				}
+				return result.rows;
+			});
+	} else {
+		return db
+			.query(
+				`SELECT 
+    articles.author,
+    articles.title,
+    articles.article_id,
+    articles.topic,
+    articles.created_at,
+    articles.votes,
+    articles.article_img_url,
+    COUNT(comments.article_id) AS comment_count 
+FROM
+    articles
+LEFT JOIN 
+    comments ON comments.article_id = articles.article_id
 GROUP BY 
     articles.article_id
 ORDER BY 
     articles.created_at DESC;`
-		)
-		.then((result) => {
-			return result.rows;
-		});
+			)
+			.then((result) => {
+				return result.rows;
+			});
+	}
 }
 
 function fetchCommentsByArticleId(lookUpArticleId) {
@@ -109,7 +141,6 @@ function findCommentToDelete(commentId) {
 
 function fetchAllUsers() {
 	return db.query("SELECT * FROM users;").then((result) => {
-		console.log(result.rows);
 		return result.rows;
 	});
 }

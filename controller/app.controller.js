@@ -6,7 +6,7 @@ const {
 	sendComment,
 	amendVotes,
 	findCommentToDelete,
-	fetchAllUsers		,
+	fetchAllUsers,
 } = require("../model/app.model");
 const allEndpoints = require("../endpoints.json");
 
@@ -35,7 +35,7 @@ function getArticleById(request, response, next) {
 }
 
 function getAllArticles(request, response, next) {
-	fetchAllArticles()
+	fetchAllArticles(request.query)
 		.then((articles) => {
 			response.status(200).send({ articles });
 		})
