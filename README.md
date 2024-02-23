@@ -6,7 +6,7 @@ You will also need to install dotenv before doing the below, you can do this by 
 
 Then you will need to setup some .env files as descibed below
 
-# To use test data
+# To use `test` data
 
 Please create a new file in the root folder of this project folder and call it .env.test. You will need to add the following text inside your .env.test file - PGDATABASE=nc_news_test
 
