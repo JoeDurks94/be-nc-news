@@ -1,6 +1,6 @@
 # About this API
 
-This API is a reddit-style RESTful API that is to be used access appliction data programatically. It is to be visualised using a front end (which is currently in development). The API is there to mimic a real world backend service which a front end can be used in order to display the data held by the backend
+This API is a reddit-style RESTful API that is used to access application data programmatically. It is to be visualised using a front end (which is currently in development). The API is there to mimic a real world backend service which a front end can be used in order to display the data held by the backend
 
 # Technology Used
 
