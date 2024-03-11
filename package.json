@@ -30,9 +30,10 @@
 		"supertest": "^6.3.4"
 	},
 	"dependencies": {
-		"husky": "^8.0.2",
+		"cors": "^2.8.5",
 		"dotenv": "^16.4.4",
 		"express": "^4.18.2",
+		"husky": "^8.0.2",
 		"pg": "^8.11.3"
 	},
 	"jest": {
