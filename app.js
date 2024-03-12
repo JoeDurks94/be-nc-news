@@ -1,7 +1,7 @@
-const cors = require('cors')
+const cors = require("cors");
 const express = require("express");
 const app = express();
-app.use(cors())
+app.use(cors());
 app.use(express.json());
 const {
 	getTopics,
@@ -14,6 +14,7 @@ const {
 	patchArticle,
 	deleteComment,
 	getAllUsers,
+	patchComment,
 } = require("./controller/app.controller.js");
 
 app.get("/api/topics", getTopics);
@@ -36,6 +37,8 @@ app.patch("/api/articles/:article_id", patchArticle);
 
 app.delete("/api/comments/:comment_id", deleteComment);
 
+app.patch("/api/comments/:comment_id", patchComment);
+
 app.use((error, request, response, next) => {
 	if (error.status) {
 		response.status(error.status).send({ msg: error.msg });
@@ -49,6 +52,7 @@ app.use((error, request, response, next) => {
 	if (error.code === "23503") {
 		response.status(404).send({ msg: "Not found!" });
 	}
+	next(error);
 });
 
 module.exports = app;

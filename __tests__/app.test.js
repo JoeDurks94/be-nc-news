@@ -648,7 +648,7 @@ describe("GET /api/articles (topic query)", () => {
 	});
 });
 
-describe("GET /api/articles/:aticle_id - extra comment_count functionality check", () => {
+describe("GET /api/articles/:article_id - extra comment_count functionality check", () => {
 	it("should be able to access the correct comment count if comments exist", () => {
 		return request(app)
 			.get("/api/articles/1")
@@ -668,5 +668,37 @@ describe("GET /api/articles/:aticle_id - extra comment_count functionality check
 				expect(data.body.article.article_id).toBe(2);
 				expect(data.body.article.comment_count).toBe("0");
 			});
+	});
+});
+
+describe("PATCH /api/comments/:comment_id", () => {
+	it("should return the correct votes", () => {
+		return request(app).patch("/api/comments/1").send({
+			inc_votes: 20,
+		}).expect(200)
+	});
+	it("should return give the correct status when decreasing comments", () => {
+		return request(app).patch("/api/comments/1").send({
+			inc_votes: -20,
+		}).expect(200)
+	});
+	it('should send back a bad request error code when passed an inc votes string', () => {
+		return request(app).patch("/api/comments/1")
+		.send({
+			inc_votes: ""
+		}).expect(400)
+	});
+	it('should send back a bad request error code when passed an inc votes string', () => {
+		return request(app).patch("/api/comments/one")
+		.send({
+			inc_votes: 10
+		}).expect(400)
+	});
+	it('should correctly increase the comment count', () => {
+			return request(app).patch("/api/comments/1").send({
+				inc_votes: 20,
+			}).expect(200).then((data) => {
+				expect(data.body.votes).toBe(36)
+			})
 	});
 });

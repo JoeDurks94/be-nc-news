@@ -4,7 +4,9 @@ const {
 	fetchAllArticles,
 	fetchCommentsByArticleId,
 	sendComment,
-	amendVotes,
+	amendArticleVotes,
+	amendCommentVotes,
+	findCommentByCommentId,
 	findCommentToDelete,
 	fetchAllUsers,
 } = require("../model/app.model");
@@ -78,12 +80,27 @@ function postComment(request, response, next) {
 function patchArticle(request, response, next) {
 	const promises = [
 		fetchArticleById(request.params.article_id),
-		amendVotes(request.params.article_id, request.body),
+		amendArticleVotes(request.params.article_id, request.body),
 	];
 	Promise.all(promises)
 		.then((data) => {
 			const formattedArticle = data[1];
 			response.status(200).send(formattedArticle);
+		})
+		.catch((error) => {
+			next(error);
+		});
+}
+
+function patchComment(request, response, next) {
+	const promises = [
+		findCommentByCommentId(request.params.comment_id),
+		amendCommentVotes(request.params.comment_id, request.body),
+	];
+	Promise.all(promises)
+		.then((data) => {
+			const formattedComment = data[1];
+			response.status(200).send(formattedComment);
 		})
 		.catch((error) => {
 			next(error);
@@ -119,6 +136,7 @@ module.exports = {
 	postComment,
 	handleInvalidEndpoiont,
 	patchArticle,
+	patchComment,
 	deleteComment,
 	getAllUsers,
 };

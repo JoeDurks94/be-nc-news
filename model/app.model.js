@@ -126,7 +126,7 @@ function sendComment(articleId, comment) {
 		});
 }
 
-function amendVotes(articleId, voteAmt) {
+function amendArticleVotes(articleId, voteAmt) {
 	if (
 		!Object.keys(voteAmt).includes("inc_votes") ||
 		typeof voteAmt.inc_votes !== "number"
@@ -137,6 +137,36 @@ function amendVotes(articleId, voteAmt) {
 		.query(
 			`UPDATE articles SET votes = votes + $1 WHERE article_id =$2 RETURNING*`,
 			[voteAmt.inc_votes, articleId]
+		)
+		.then((result) => {
+			return result.rows[0];
+		});
+}
+
+function findCommentByCommentId(commentId) {
+	return db
+		.query(
+			`SELECT * FROM comments WHERE comment_id = $1;`,[commentId]
+		)
+		.then((results) => {
+			if (results.rows.length === 0) {
+				return Promise.reject({ status: 404, msg: "comment does not exist" });
+			}
+			return results.rows[0]
+		})
+}
+
+function amendCommentVotes(commentId, voteAmt) {
+	if (
+		!Object.keys(voteAmt).includes("inc_votes") ||
+		typeof voteAmt.inc_votes !== "number"
+	) {
+		return Promise.reject({ status: 400, msg: "Bad request!" });
+	}
+	return db
+		.query(
+			`UPDATE comments SET votes = votes + $1 WHERE comment_id =$2 RETURNING*`,
+			[voteAmt.inc_votes, commentId]
 		)
 		.then((result) => {
 			return result.rows[0];
@@ -171,7 +201,9 @@ module.exports = {
 	fetchArticleById,
 	fetchAllArticles,
 	sendComment,
-	amendVotes,
+	amendArticleVotes,
 	findCommentToDelete,
 	fetchAllUsers,
+	amendCommentVotes,
+	findCommentByCommentId
 };
