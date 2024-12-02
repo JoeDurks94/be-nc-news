@@ -9,6 +9,7 @@ const {
 	findCommentByCommentId,
 	findCommentToDelete,
 	fetchAllUsers,
+	sendArticle,
 } = require("../model/app.model");
 const allEndpoints = require("../endpoints.json");
 
@@ -127,6 +128,16 @@ function getAllUsers(request, response, next) {
 		});
 }
 
+function postArticle(request, response, next) {
+	sendArticle(request.body)
+		.then((data) => {
+			response.status(201).send(data);
+		})
+		.catch((error) => {
+			next(error);
+		});
+}
+
 module.exports = {
 	getCommentsByArticleId,
 	getTopics,
@@ -139,4 +150,5 @@ module.exports = {
 	patchComment,
 	deleteComment,
 	getAllUsers,
+	postArticle
 };

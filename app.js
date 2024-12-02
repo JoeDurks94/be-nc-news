@@ -15,6 +15,7 @@ const {
 	deleteComment,
 	getAllUsers,
 	patchComment,
+	postArticle,
 } = require("./controller/app.controller.js");
 
 app.get("/api/topics", getTopics);
@@ -29,7 +30,6 @@ app.get("/api/articles/:article_id/comments", getCommentsByArticleId);
 
 app.get("/api/users", getAllUsers);
 
-app.get("/api/*", handleInvalidEndpoiont);
 
 app.post("/api/articles/:article_id/comments", postComment);
 
@@ -38,6 +38,10 @@ app.patch("/api/articles/:article_id", patchArticle);
 app.delete("/api/comments/:comment_id", deleteComment);
 
 app.patch("/api/comments/:comment_id", patchComment);
+
+app.post("/api/articles", postArticle)
+
+app.get("/api/*", handleInvalidEndpoiont);
 
 app.use((error, request, response, next) => {
 	if (error.status) {

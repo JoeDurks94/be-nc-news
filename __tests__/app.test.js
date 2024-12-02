@@ -688,7 +688,7 @@ describe("PATCH /api/comments/:comment_id", () => {
 			inc_votes: ""
 		}).expect(400)
 	});
-	it('should send back a bad request error code when passed an inc votes string', () => {
+	it('should send back a bad request error code when passed an string article_id', () => {
 		return request(app).patch("/api/comments/one")
 		.send({
 			inc_votes: 10
@@ -702,3 +702,66 @@ describe("PATCH /api/comments/:comment_id", () => {
 			})
 	});
 });
+
+describe('POST /api/articles', () => {
+	it('should give a 201 status code when passed all the required information in the request body but no article_img_url', () => {
+        return request(app).post('/api/articles').send({
+            title: "test title",
+            topic: "mitch",
+            author: "icellusedkars",
+            body: "test body",
+        })
+		.expect(201)
+	})
+	it('should give a 201 status code when passed all the required information in the request body as well as an article_img_url', () => {
+		return request(app).post('/api/articles').send({
+			title: "test title",
+			topic: "mitch",
+			author: "icellusedkars",
+			body: "test body",
+			article_img_url: "https://c02.purpledshub.com/uploads/sites/39/2023/05/Specialized-Rockhopper-Elite-29-climb-243ee75.jpg?w=1240&webp=1"
+		}).expect(201)
+	})
+	it('should respond with the complete article object after sending all the required information', () => {
+		return request(app).post('/api/articles').send({
+            title: "test title",
+            topic: "mitch",
+            author: "icellusedkars",
+            body: "test body",
+        })
+		.expect(201).then((data) => {
+			expect(data.body).toMatchObject({
+				article_id: 14,
+				title: "test title",
+				topic: "mitch",
+				created_at: expect.any(String),
+				votes: 0,
+				author:	"icellusedkars",
+				body: "test body",	
+			})
+		})
+	})
+	it('should give a 400 error when a required field is not submitted', () => {
+		return request(app).post('/api/articles').send({
+			title: "test title",
+			topic: "mitch",
+			author: "icellusedkars",
+		}).expect(400)
+	})
+	it('should give a 404 error when a topic that doesnt exist in the database is passed', () => {
+		return request(app).post('/api/articles').send({
+			title: "test title",
+			topic: "flowers",
+			author: "rogersop",
+			body: "test body"
+		}).expect(404)
+	})
+	it('should give a 404 error when a user that doesnt exist in the database is passed', () => {
+		return request(app).post('/api/articles').send({
+			title: "test title",
+			topic: "mitch",
+			author: "loopylou",
+			body: "test body"
+		}).expect(404)
+	})
+})

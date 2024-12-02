@@ -195,6 +195,47 @@ function fetchAllUsers() {
 	});
 }
 
+function sendArticle(article) {
+	if (
+		!Object.keys(article).includes("title") ||
+		!Object.keys(article).includes("topic") ||
+		!Object.keys(article).includes("author") ||
+		!Object.keys(article).includes("body")
+	) {
+		return Promise.reject({ status: 400, msg: "Bad request!" });
+	}
+	if (Object.keys(article).length > 5) {
+		return Promise.reject({ status: 400, msg: "Bad request!" });
+	}
+
+	const imgUrlCheck = /^https?:\/\/.*\.(jpg|jpeg|png|gif|webp)(\?.*)?$/i
+
+	if(!article.article_img_url) {
+		
+		return db
+		.query(
+			`INSERT INTO articles (title, topic, author, body) VALUES ($1, $2, $3, $4) RETURNING *;`,
+			[article.title, article.topic, article.author, article.body]
+		)
+		.then((result) => {
+			return result.rows[0];
+		});
+	}
+
+	if(!imgUrlCheck.test(article.article_img_url)) {
+		return Promise.reject({ status: 400, msg: "Invalid image URL!" });
+	}
+
+	return db
+		.query(
+			`INSERT INTO articles (title, topic, author, body, article_img_url) VALUES ($1, $2, $3, $4, $5) RETURNING *;`,
+			[article.title, article.topic, article.author, article.body, article.article_img_url]
+		)
+		.then((result) => {
+			return result.rows[0];
+		});
+}
+
 module.exports = {
 	fetchCommentsByArticleId,
 	fetchAllTopics,
@@ -205,5 +246,6 @@ module.exports = {
 	findCommentToDelete,
 	fetchAllUsers,
 	amendCommentVotes,
-	findCommentByCommentId
+	findCommentByCommentId,
+	sendArticle
 };
