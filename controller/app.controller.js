@@ -10,6 +10,7 @@ const {
 	findCommentToDelete,
 	fetchAllUsers,
 	sendArticle,
+	removeArticleByArticleId,
 } = require("../model/app.model");
 const allEndpoints = require("../endpoints.json");
 
@@ -138,6 +139,17 @@ function postArticle(request, response, next) {
 		});
 }
 
+
+function deleteArticleByArticleId(request, response, next) {
+	removeArticleByArticleId(request.params.article_id)
+		.then(() => {
+			response.status(204).send();
+		})
+		.catch((error) => {
+			next(error);
+		});
+}
+
 module.exports = {
 	getCommentsByArticleId,
 	getTopics,
@@ -150,5 +162,6 @@ module.exports = {
 	patchComment,
 	deleteComment,
 	getAllUsers,
-	postArticle
+	postArticle,
+	deleteArticleByArticleId,
 };

@@ -765,3 +765,15 @@ describe('POST /api/articles', () => {
 		}).expect(404)
 	})
 })
+
+describe('DELETE /api/articles/:article_id', () => {
+	it('should give a 204 status code when passed a valid article_id', () => {
+		return request(app).delete('/api/articles/6').expect(204);
+	});
+	it('should give a 404 status code when passed a article_id that is valid but does not exist', () => {
+		return request(app).delete('/api/articles/564').expect(404);
+	});
+	it('should give a 400 status code when passed a article_id that is invalid', () => {
+		return request(app).delete('/api/articles/four').expect(400);
+	});
+});

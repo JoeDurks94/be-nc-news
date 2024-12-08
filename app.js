@@ -16,6 +16,7 @@ const {
 	getAllUsers,
 	patchComment,
 	postArticle,
+	deleteArticleByArticleId
 } = require("./controller/app.controller.js");
 
 app.get("/api/topics", getTopics);
@@ -40,6 +41,8 @@ app.delete("/api/comments/:comment_id", deleteComment);
 app.patch("/api/comments/:comment_id", patchComment);
 
 app.post("/api/articles", postArticle)
+
+app.delete("/api/articles/:article_id", deleteArticleByArticleId)
 
 app.get("/api/*", handleInvalidEndpoiont);
 
